@@ -21,4 +21,4 @@ export type Match = {
   score: Score | null;
 };
 
-export type Filter = 'all' | 'upcoming' | 'finished';
+export type Filter = 'all' | 'upcoming' | 'finished' | 'live';

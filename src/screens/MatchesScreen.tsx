@@ -10,16 +10,18 @@ const STATUS_LABELS: Record<MatchStatus, string> = {
   scheduled: 'Запланирован',
   live: 'Идёт',
   finished: 'Завершён',
-  postponed: 'Перенесён',
+  postponed: 'Отложен',
 };
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: 'all', label: 'Все' },
   { key: 'upcoming', label: 'Предстоящие' },
   { key: 'finished', label: 'Завершённые' },
+  { key: 'live', label:'Сейчас трансляция'}
 ];
 
 function formatStartDate(startsAt: string | null): string {
+  if(!startsAt) return 'дата неизвестна'
   return new Date(startsAt).toLocaleString('ru-RU', {
     day: 'numeric',
     month: 'long',
@@ -70,7 +72,8 @@ export function MatchesScreen() {
   // фильтры
   const visibleMatches = useMemo(() => {
     if (filter === 'finished') return matches.filter((m) => m.status === 'finished');
-    if (filter === 'upcoming') return matches.filter((m) => m.status !== 'finished');
+    if (filter === 'upcoming') return matches.filter((m) => m.status !== 'finished' && m.status !== 'live');
+    if (filter === 'live') return matches.filter((m) => m.status === 'live')
     return matches;
   }, [matches, filter]);
 
