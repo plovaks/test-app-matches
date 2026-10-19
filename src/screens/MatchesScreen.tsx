@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { MATCHES_URL } from '../config';
 import { UpdatedAgo } from '../components/UpdatedAgo';
 import { Filter, Match, MatchStatus } from '../types';
+import { FavoriteButton } from '../components/FavoriteButton';
+import { useFavorites } from '../hooks/useFavorites';
 
 const STATUS_LABELS: Record<MatchStatus, string> = {
   scheduled: 'Запланирован',
@@ -34,6 +36,7 @@ export function MatchesScreen() {
   const [refreshing, setRefreshing] = useState(false); 
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [filter, setFilter] = useState<Filter>('all');
+  const { favorites, isFavorite, toggle } = useFavorites();
 
   // переменные для адаптивной верстки
   const { width } = useWindowDimensions();
@@ -148,10 +151,13 @@ export function MatchesScreen() {
                 <Text style={styles.score}>{item.score !== null ? item.score.away : ''}</Text>
               </View>
               <Text style={styles.meta}>{formatStartDate(item.startsAt)}</Text>
-              <Text style={styles.status}>
-                {STATUS_LABELS[item.status] ?? item.status}
-                {item.status === 'live' && item.minute != null ? ` ${item.minute} минут` : ''}
-              </Text>
+              <View style={styles.statusRow}>
+                <Text style={styles.status}>
+                  {STATUS_LABELS[item.status] ?? item.status}
+                  {item.status === 'live' && item.minute != null ? ` ${item.minute} минут` : ''}
+                </Text>
+                <FavoriteButton active={isFavorite(item.id)} onPress={() => toggle(item.id)} />
+            </View>
             </View>
           )}
         />
@@ -225,5 +231,6 @@ const styles = StyleSheet.create({
   team: { flex: 1, fontSize: 15, fontWeight: '600', marginRight: 8 },
   score: { fontSize: 18, fontWeight: '700' },
   meta: { marginTop: 6, color: '#666', fontSize: 13 },
-  status: { marginTop: 2, color: '#7099f1', fontSize: 13, fontWeight: '600' },
+  status: { color: '#7099f1', fontSize: 13, fontWeight: '600' },
+  statusRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }
 });
